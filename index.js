@@ -14,9 +14,7 @@ dotenv.config(); // Load environment variables
 const app = express();
 
 app.use(express.json());
-app.use(cors({
-    origin:''
-}));
+app.use(cors());
 
 const URI = process.env.MongoDBURI;
 
@@ -51,7 +49,7 @@ app.post("/upload", upload.single('product'), (req, res) => {
     }
     res.json({
         success: true,
-        image_url: `https://e-commerce-backend-yi2a.onrender.com/image/${req.file.filename}`
+        image_url: `https://e-commerce-backend-yi2a.onrender.com/images/${req.file.filename}`
     });
 });
 
@@ -264,20 +262,19 @@ app.get('/popularinwomen', async (req, res) => {
 });
 
 // Middleware to fetch user
-const fetchUser = (req, res, next) => {
+const fetchUser = async (req, res, next) => {
     const token = req.header('auth-token');
     if (!token) {
         return res.status(401).json({ error: 'Please authenticate with a valid token' });
     }
     try {
-        const data = jwt.verify(token, process.env.JWT_SECRET);
+        const data = jwt.verify(token, 'secret_ecom');
         req.user = data;
         next();
     } catch (error) {
         res.status(401).json({ error: 'Invalid token' });
     }
 };
-
 
 // Endpoint for adding data to cart
 app.post('/addtocart', fetchUser, async (req, res) => {
