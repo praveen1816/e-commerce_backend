@@ -264,22 +264,20 @@ app.get('/popularinwomen', async (req, res) => {
 });
 
 // Middleware to fetch user
-const fetchUser = async (req, res, next) => {
+const fetchUser = (req, res, next) => {
     const token = req.header('auth-token');
     if (!token) {
         return res.status(401).json({ error: 'Please authenticate with a valid token' });
     }
     try {
-        const data = jwt.verify(
-      req.headers.authorization,
-      process.env.JWT_SECRET
-        );
+        const data = jwt.verify(token, process.env.JWT_SECRET);
         req.user = data;
         next();
     } catch (error) {
         res.status(401).json({ error: 'Invalid token' });
     }
 };
+
 
 // Endpoint for adding data to cart
 app.post('/addtocart', fetchUser, async (req, res) => {
